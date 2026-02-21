@@ -12,7 +12,7 @@ template_id2 = "gqt4OOFn7Rs68vsdoW0T52j9MdVNmtGBxxMJNm7vEr4"
 template_id3 = "WT41FmmHK_mdSKGIpmyGl9jCMr0QStFZZTMeWPchfxg"
 # 接收公众号消息的微信号
 # 这是openid
-user = ["ojhdR50T******************"]
+user = ["ofITE2LRLPbmzqCX4BbLXnpngxX0"]
 
 # 信息配置
 # 所在省份
@@ -110,5 +110,6 @@ classes = \
 # 第四讲: {{fourthClass.DATA}}
 # 第五讲: {{fifthClass.DATA}}
 # 第六讲: {{sixthClass.DATA}}
+
 
 
