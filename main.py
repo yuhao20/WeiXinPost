@@ -377,23 +377,24 @@ if __name__ == '__main__':
                 print("开始睡眠: 等待推送第", i + 1, "讲课")
                 time.sleep(defference)
                 print("结束睡眠")
-    while True:
-        goodNightTime = config.good_Night_Time
-        nowTime = datetime.now().strftime('%H:%M:%S')
-        if goodNightTime == nowTime:
-            # 发送晚安心语
-            send_Good_Night(user, accessToken)
-            print("晚安心语推送成功！")
-            break
-        elif goodNightTime < nowTime:
-            print("当前时间已过晚安心语推送设置的时间！")
-            break
-        elif calculate_Time_Difference(goodNightTime, nowTime) > 120:
-            break
-        # 通过睡眠定时
-        defference = calculate_Time_Difference(goodNightTime, nowTime) - 3
-        print("晚安心语推送时间差：", defference, "秒")
-        if defference > 0:
-            print("开始睡眠:等待推送晚安心语")
-            time.sleep(defference)
-            print("结束睡眠")
+    # while True:
+    #     goodNightTime = config.good_Night_Time
+    #     nowTime = datetime.now().strftime('%H:%M:%S')
+    #     if goodNightTime == nowTime:
+    #         # 发送晚安心语
+    #         send_Good_Night(user, accessToken)
+    #         print("晚安心语推送成功！")
+    #         break
+    #     elif goodNightTime < nowTime:
+    #         print("当前时间已过晚安心语推送设置的时间！")
+    #         break
+    #     elif calculate_Time_Difference(goodNightTime, nowTime) > 120:
+    #         break
+    #     # 通过睡眠定时
+    #     defference = calculate_Time_Difference(goodNightTime, nowTime) - 3
+    #     print("晚安心语推送时间差：", defference, "秒")
+    #     if defference > 0:
+    #         print("开始睡眠:等待推送晚安心语")
+    #         time.sleep(defference)
+    #         print("结束睡眠")
+
