@@ -36,7 +36,7 @@ year = 2026
 month = 2
 day = 15
 # 每日推送时间
-post_Time = "07:30:00"
+post_Time = "07:33:00"
 # 每节课提醒时间（有课才会提醒）, 时:分:秒  的形式, 字符串, 根据个人需要设置几次
 time_table = ["07:40:00", "09:40:00", "13:40:00", "15:40:00", "18:40:00"]
 # 课程时间
@@ -159,6 +159,7 @@ classes = {str(i): [[*random.choice(_phrases)] for _ in range(7)] for i in range
 # 第六讲: {{sixthClass.DATA}}
 
 # emoji: https://emoji6.com/emojiall/en
+
 
 
 
