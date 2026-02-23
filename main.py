@@ -531,6 +531,8 @@ def main():
     #             print("开始睡眠: 等待推送第", i + 1, "节课")
     #             time.sleep(defference)
     #             print("结束睡眠")
+    #         else:
+    #             time.sleep(0.1)  # 临近目标时间，短睡防止空转
 
 
     # 天气提醒推送
@@ -564,6 +566,8 @@ def main():
                 print("开始睡眠: 等待推送第", i + 1, "个天气提醒")
                 time.sleep(diff)
                 print("结束睡眠")
+            else:
+                time.sleep(0.1)  # 临近目标时间，短睡防止空转
     # for i in range(len(class_end_time)):
     #     endTime = class_end_time[i]
     #     nowTime = datetime.now().strftime('%H:%M:%S')
