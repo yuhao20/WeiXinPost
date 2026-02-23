@@ -496,16 +496,20 @@ def main():
     city = config.city
     weather, max_temperature, min_temperature = get_weather(city)
 
+    isSent = False
+    isPost = False
+
     # 每日推送：模板消息显示完整内容，点击标题跳转彩色图片卡片
     if datetime.now().strftime('%H:%M:%S') < config.post_Time:
         send_message(user, accessToken, city, weather, max_temperature, min_temperature)
+        isSent = True
+        isPost = True
 
 
 
     # 课程提醒推送
     # todayClasses = get_Today_Class()
     # time_table = config.time_table
-    # isPost = False
     # for i in range(len(time_table)):
     #     if isPost:
     #         break
@@ -537,7 +541,7 @@ def main():
 
     # 天气提醒推送
     class_end_time = config.class_end_time
-    isSent = False
+    
     for i in range(len(class_end_time)):
         if isSent:
             break
@@ -600,3 +604,4 @@ def main():
 # ==================== 主程序 ====================
 if __name__ == '__main__':
     main()
+
