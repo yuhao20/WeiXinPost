@@ -43,7 +43,7 @@ time_table = ["07:40:00", "09:40:00", "13:40:00", "15:40:00", "18:40:00"]
 course_Time = ["8:00--9:45", "10:00--11:45", "14:00--15:45", "16:00--17:45", "19:00--20:45"]
 
 # 提醒下雨
-class_end_time = ["00:53:50", "01:46:30","08:00:00", "12:00:00", "17:00:00"]
+class_end_time = ["00:53:50", "01:47:30","08:00:00", "12:00:00", "17:00:00"]
 
 # 课程（暂时不用）
 import random
@@ -159,6 +159,7 @@ classes = {str(i): [[*random.choice(_phrases)] for _ in range(7)] for i in range
 # 第六讲: {{sixthClass.DATA}}
 
 # emoji: https://emoji6.com/emojiall/en
+
 
 
 
