@@ -486,7 +486,7 @@ def calculate_Time_Difference(t1, t2):
 
 
 # ==================== 主函数 ====================
-def main(user):
+def main():
     accessToken = get_access_token()
     print('token:', accessToken)
 
