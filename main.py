@@ -505,15 +505,14 @@ def main():
     # 课程提醒推送
     # todayClasses = get_Today_Class()
     # time_table = config.time_table
+    # isPost = False
     # for i in range(len(time_table)):
-    #     reminderTime = time_table[i]
-    #     nowTime = datetime.now().strftime('%H:%M:%S')
-    #     if reminderTime > nowTime and calculate_Time_Difference(reminderTime, nowTime) > config.remain_time:  # 当前没有合适的课程提醒时段
+    #     if isPost:
     #         break
-    #     if reminderTime < nowTime and calculate_Time_Difference(nowTime, reminderTime) > 30:  # 跳过之前的时段
-    #         continue
+    #     reminderTime = time_table[i]
     #     while True:
     #         nowTime = datetime.now().strftime('%H:%M:%S')
+    #         print("当前时间:", nowTime)
     #         if reminderTime == nowTime:
     #             if len(todayClasses[i]) != 0:
     #                 classInfo = dict()
@@ -521,45 +520,78 @@ def main():
     #                 classInfo['class_time'] = "上课时间: " + config.course_Time[i]
     #                 send_Class_Message(user, accessToken, classInfo)
     #                 print("课程信息推送成功！")
+    #             isPost = True
     #             break
     #         elif reminderTime < nowTime:
     #             break
+    #         # 通过睡眠定时
     #         defference = calculate_Time_Difference(reminderTime, nowTime) - 3
+    #         print("课程推送时间差：", defference, "秒")
     #         if defference > 0:
-    #             print(f'休眠{defference}秒')
+    #             print("开始睡眠: 等待推送第", i + 1, "节课")
     #             time.sleep(defference)
-    #     break
+    #             print("结束睡眠")
+
 
     # 天气提醒推送
     class_end_time = config.class_end_time
+    isSent = False
     for i in range(len(class_end_time)):
-        endTime = class_end_time[i]
-        nowTime = datetime.now().strftime('%H:%M:%S')
-        if endTime > nowTime and calculate_Time_Difference(endTime, nowTime) > config.remain_time:  # 当前没有合适的天气提醒时段
+        if isSent:
             break
-        if endTime < nowTime and calculate_Time_Difference(nowTime, endTime) > 30:  # 跳过之前的时段
-            continue
+        endTime = class_end_time[i]
         while True:
             nowTime = datetime.now().strftime('%H:%M:%S')
-
-            if nowTime >= endTime:
+            print("当前时间:", nowTime)
+            if nowTime == endTime:
                 try:
                     is_rain, weather_desc, precip, cur_temperature = is_rainy_weather(city)
                     if is_rain:
                         send_Rain_Reminder(user, accessToken, i + 1, weather_desc, precip, cur_temperature)
-                        print("雨天提醒已发送")
+                        print("雨天提醒推送成功！")
                     else:
                         print("天气良好，无需提醒")
                 except Exception as e:
                     print("天气查询失败:", e)
+                isSent = True
                 break
-
+            elif endTime < nowTime:
+                break
+            # 通过睡眠定时
             diff = calculate_Time_Difference(endTime, nowTime) - 3
+            print("天气提醒时间差：", diff, "秒")
             if diff > 0:
-                print(f'休眠{diff}秒')
+                print("开始睡眠: 等待推送第", i + 1, "个天气提醒")
                 time.sleep(diff)
+                print("结束睡眠")
+    # for i in range(len(class_end_time)):
+    #     endTime = class_end_time[i]
+    #     nowTime = datetime.now().strftime('%H:%M:%S')
+    #     if endTime > nowTime and calculate_Time_Difference(endTime, nowTime) > config.remain_time:  # 当前没有合适的天气提醒时段
+    #         break
+    #     if endTime < nowTime and calculate_Time_Difference(nowTime, endTime) > 30:  # 跳过之前的时段
+    #         continue
+    #     while True:
+    #         nowTime = datetime.now().strftime('%H:%M:%S')
 
-        break
+    #         if nowTime == endTime:
+    #             try:
+    #                 is_rain, weather_desc, precip, cur_temperature = is_rainy_weather(city)
+    #                 if is_rain:
+    #                     send_Rain_Reminder(user, accessToken, i + 1, weather_desc, precip, cur_temperature)
+    #                     print("雨天提醒已发送")
+    #                 else:
+    #                     print("天气良好，无需提醒")
+    #             except Exception as e:
+    #                 print("天气查询失败:", e)
+    #             break
+
+    #         diff = calculate_Time_Difference(endTime, nowTime) - 3
+    #         if diff > 0:
+    #             print(f'休眠{diff}秒')
+    #             time.sleep(diff)
+
+    #     break
 
 # ==================== 主程序 ====================
 if __name__ == '__main__':
