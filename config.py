@@ -5,17 +5,22 @@ app_id = "wxc0b88a073a0c048c"
 app_secret = "ded8b104956254b98e038590fe686865"
 # 模板消息id
 # 每日消息
-template_id1 = "STZa4XVt_5ESlNrd4drHmvFIeVGDYh8wuS_n5OvpXgA"
+template_id1 = "Inn5o0ck3XCZvm8HO4qYjIYe4t73YnNeoVSIC1HMxYo"
 # 课程消息,上课提醒
 template_id2 = "oHf0CtjkUfYNM_AWUL7v5ZlMPKooLMK1dN2I3Z-w0Ug"
 # 天气提醒
-template_id3 = "yMuECyCCpGkxXggk4BH7U__ksmERw_ZGUIRnlryXXrg"
+template_id3 = "AneQEpDysBwH3xHb1YlU05MGz8hqsFZAAHRpqeCQFmk"
 # 接收公众号消息的微信号
 # 这是openid
 user = ["ofITE2LRLPbmzqCX4BbLXnpngxX0"]
 
 # 提醒时间窗口 触发剩余时间小于该值 s
 remain_time = 300
+
+# gitee 配置
+gitee_token = "54b7f137802f7b57d6952e81478d34e7"
+gitee_owner = "jin-yuhao520"
+gitee_repo  = "wx-images"
 
 # 信息配置
 # 所在城市
@@ -31,14 +36,14 @@ year = 2026
 month = 2
 day = 15
 # 每日推送时间
-post_Time = "13:10:00"
+post_Time = "07:30:00"
 # 每节课提醒时间（有课才会提醒）, 时:分:秒  的形式, 字符串, 根据个人需要设置几次
 time_table = ["07:40:00", "09:40:00", "13:40:00", "15:40:00", "18:40:00"]
 # 课程时间
 course_Time = ["8:00--9:45", "10:00--11:45", "14:00--15:45", "16:00--17:45", "19:00--20:45"]
 
 # 提醒下雨
-class_end_time = ["08:00:00", "13:30:00", "17:30:00"]
+class_end_time = ["08:00:00", "12:00:00", "17:30:00"]
 
 # 课程（暂时不用）
 import random
@@ -104,8 +109,33 @@ classes = {str(i): [[*random.choice(_phrases)] for _ in range(7)] for i in range
 # 天气： {{weather.DATA}}
 # 最低气温: {{min_temperature.DATA}}
 # 最高气温: {{max_temperature.DATA}}
-# 今天是破壳日的第: {{love_day.DATA}} 天
+# 今天是破壳日的第: {{birthday.DATA}} 天
 # 距离开学还有: {{birthday.DATA}} 天
+'''
+----------------今日天气---------------- 
+🌏️今天是： {{date.DATA}} 
+🗺️城  市： {{city.DATA}} 
+⛺️天  气： {{weather.DATA}} 
+🏞️最低温： {{min_temperature.DATA}} 
+🏝️最高温： {{max_temperature.DATA}} 
+----------------今日课程---------------- 
+1️⃣第一节： {{firstClass.DATA}} 
+2️⃣第二节： {{secondClass.DATA}} 
+3️⃣第三节： {{thirdClass.DATA}} 
+4️⃣第四节： {{fourthClass.DATA}} 
+5️⃣第五节： {{fifthClass.DATA}} 
+6️⃣第六节： {{sixthClass.DATA}} 
+---------------------------------------- 
+🤴Kim💖Chua👸 👆️点击看图片👆️
+'''
+
+'''
+⚡当前天气： {{weather_desc.DATA}} 
+🌡️当前温度： {{cur_tmeperature.DATA}}℃ 
+💧今日降水： {{precip.DATA}}mm 
+⭐️我有话说： 小宝不要淋湿了！哼哼！
+'''
+
 # ----------------今日课程----------------
 # 第一讲: {{firstClass.DATA}}
 # 第二讲: {{secondClass.DATA}}
