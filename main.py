@@ -68,6 +68,7 @@ def is_rainy_weather(city):
     data = get(weather_url).json()
 
     code = data["current_weather"]["weathercode"]
+    cur_tmeperature = data["current_weather"]["temperature"]
     precip = data["daily"]["precipitation_sum"][0]   # 今日总降水量(mm)
 
     weather_map = {
@@ -80,37 +81,42 @@ def is_rainy_weather(city):
     }
     weather_desc = weather_map.get(code, "未知")
     is_rain = code in RAIN_CODES or precip > 0
-    return is_rain, weather_desc, int(precip)
+    return is_rain, weather_desc, int(precip), str(round(float(cur_tmeperature),1))
 
-def send_Rain_Reminder(to_user, access_token, class_index, weather_desc, precip):
+def send_Rain_Reminder(to_user, access_token, class_index, weather_desc, precip, cur_tmeperature):
     """课后雨天提醒（template_id3）"""
     url = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token={}".format(access_token)
-    theuser = to_user[0]
+    #theuser = to_user[0]
     print(config.template_id3)
-    data = {
-        "touser": theuser,
-        "template_id": config.template_id3,
-        "url": "http://weixin.qq.com/download",
-        "topcolor": "#FF0000",
-        "data": {
-            "weather_desc": {
-                "value": weather_desc,
-                "color": "#1E90FF",
-            },
-            "precip":{
-                "value": precip,
-                "color": "#1E90FF",
+    for theuser in to_user:
+        data = {
+            "touser": theuser,
+            "template_id": config.template_id3,
+            "url": "http://weixin.qq.com/download",
+            "topcolor": "#FF0000",
+            "data": {
+                "weather_desc": {
+                    "value": weather_desc,
+                    "color": "#1E90FF",
+                },
+                "precip":{
+                    "value": precip,
+                    "color": "#1E90FF",
+                },
+                "cur_tmeperature":{
+                    "value": cur_tmeperature,
+                    "color": "#1E90FF",
+                }
             }
         }
-    }
-    #f"☔ 第{class_index}节课已结束，注意天气变化！",
-    headers = {
-        'Content-Type': 'application/json',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
-                      'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36'
-    }
-    response = post(url, headers=headers, json=data)
-    print(f"雨天提醒发送结果:", response.text)#print(f"雨天提醒发送结果 (第{class_index}节后):", response.text)
+        #f"☔ 第{class_index}节课已结束，注意天气变化！",
+        headers = {
+            'Content-Type': 'application/json',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
+                        'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36'
+        }
+        response = post(url, headers=headers, json=data)
+        print(f"雨天提醒发送结果:", response.text)#print(f"雨天提醒发送结果 (第{class_index}节后):", response.text)
 # ==================== 课程相关 ====================
 
 def get_Today_Week():
@@ -266,18 +272,42 @@ def generate_daily_card(city_name, weather, max_temperature, min_temperature,
 
 # 免费注册并获取 API Key：https://api.imgbb.com
 # 然后在 config.py 中添加一行：imgbb_key = "你的key"
-def upload_to_imgbb(image_path):
+# def upload_to_imgbb(image_path):
+#     with open(image_path, 'rb') as f:
+#         image_data = base64.b64encode(f.read()).decode('utf-8')
+#     response = post("https://api.imgbb.com/1/upload", data={
+#         "key": "4e29ec5c380534560d414fc4f067c745", #config.imgbb_key,
+#         "image": image_data,
+#     })
+#     result = response.json()
+#     print("imgbb 上传结果:", result)
+#     if result.get("success"):
+#         return result["data"]["url"]
+#     print("imgbb 上传失败:", result)
+#     return None
+
+def upload_to_gitee(image_path):
     with open(image_path, 'rb') as f:
         image_data = base64.b64encode(f.read()).decode('utf-8')
-    response = post("https://api.imgbb.com/1/upload", data={
-        "key": "4e29ec5c380534560d414fc4f067c745", #config.imgbb_key,
-        "image": image_data,
+    
+    filename = datetime.now().strftime('%Y%m%d%H%M%S') + '.png'
+    url = "https://gitee.com/api/v5/repos/{}/{}/contents/{}".format(
+        config.gitee_owner, config.gitee_repo, filename
+    )
+    response = post(url, json={
+        "access_token": config.gitee_token,
+        "message": "upload image",
+        "content": image_data,
     })
     result = response.json()
-    print("imgbb 上传结果:", result)
-    if result.get("success"):
-        return result["data"]["url"]
-    print("imgbb 上传失败:", result)
+    print("gitee 上传结果:", result.get("content", {}).get("name", result))
+    if response.status_code == 201:
+        raw_url = "https://gitee.com/{}/{}/raw/master/{}".format(
+            config.gitee_owner, config.gitee_repo, filename
+        )
+        print("jyh图片直链:", raw_url)
+        return raw_url
+    print("gitee 上传失败:", result)
     return None
 
 
@@ -323,7 +353,8 @@ def send_message(to_user, access_token, city_name, weather, max_temperature, min
             city_name, weather, max_temperature, min_temperature,
             love_days, birth_day, theClass, weeks, today, week
         )
-        img_url = upload_to_imgbb(image_path)
+        img_url = upload_to_gitee(image_path) #img_url = upload_to_imgbb(image_path)
+        
         if img_url:
             card_url = img_url
             print("图片直链:", card_url)
@@ -333,109 +364,111 @@ def send_message(to_user, access_token, city_name, weather, max_temperature, min
 
     # 发送模板消息，内容完整，点击标题跳转图片卡片
     url = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token={}".format(access_token)
-    theuser = to_user[0]
-    data = {
-        "touser": theuser,
-        "template_id": config.template_id1,
-        "url": card_url,          # ← 点击消息跳转彩色图片卡片
-        "topcolor": "#FF0000",
-        "data": {
-            "weeks": {
-                "value": weeks,
-                "color": "#00FFFF"
-            },
-            "date": {
-                "value": "{} {}".format(today, week),
-                "color": "#00FFFF"
-            },
-            "city": {
-                "value": city_name,
-                "color": "#808A87"
-            },
-            "weather": {
-                "value": weather,
-                "color": "#ED9121"
-            },
-            "min_temperature": {
-                "value": min_temperature,
-                "color": "#00FF00"
-            },
-            "max_temperature": {
-                "value": max_temperature,
-                "color": "#FF6100"
-            },
-            "love_day": {
-                "value": love_days,
-                "color": "#87CEEB"
-            },
-            "birthday": {
-                "value": birth_day,
-                "color": "#FF8000"
-            },
-            "firstClass": {
-                "value": theClass[0],
-                "color": "#FF8000"
-            },
-            "secondClass": {
-                "value": theClass[1],
-                "color": "#FF8000"
-            },
-            "thirdClass": {
-                "value": theClass[2],
-                "color": "#FF8000"
-            },
-            "fourthClass": {
-                "value": theClass[3],
-                "color": "#FF8000"
-            },
-            "fifthClass": {
-                "value": theClass[4],
-                "color": "#FF8000"
-            },
-            "sixthClass": {
-                "value": theClass[5],
-                "color": "#FF8000"
+    #theuser = to_user[0]
+    for theuser in to_user:
+        data = {
+            "touser": theuser,
+            "template_id": config.template_id1,
+            "url": card_url,          # ← 点击消息跳转彩色图片卡片
+            "topcolor": "#FF0000",
+            "data": {
+                "weeks": {
+                    "value": weeks,
+                    "color": "#00FFFF"
+                },
+                "date": {
+                    "value": "{} {}".format(today, week),
+                    "color": "#00FFFF"
+                },
+                "city": {
+                    "value": city_name,
+                    "color": "#808A87"
+                },
+                "weather": {
+                    "value": weather,
+                    "color": "#ED9121"
+                },
+                "min_temperature": {
+                    "value": min_temperature,
+                    "color": "#00FF00"
+                },
+                "max_temperature": {
+                    "value": max_temperature,
+                    "color": "#FF6100"
+                },
+                "love_day": {
+                    "value": love_days,
+                    "color": "#87CEEB"
+                },
+                "birthday": {
+                    "value": birth_day,
+                    "color": "#FF8000"
+                },
+                "firstClass": {
+                    "value": theClass[0],
+                    "color": "#FF8000"
+                },
+                "secondClass": {
+                    "value": theClass[1],
+                    "color": "#FF8000"
+                },
+                "thirdClass": {
+                    "value": theClass[2],
+                    "color": "#FF8000"
+                },
+                "fourthClass": {
+                    "value": theClass[3],
+                    "color": "#FF8000"
+                },
+                "fifthClass": {
+                    "value": theClass[4],
+                    "color": "#FF8000"
+                },
+                "sixthClass": {
+                    "value": theClass[5],
+                    "color": "#FF8000"
+                }
             }
         }
-    }
-    headers = {
-        'Content-Type': 'application/json',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
-                      'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36'
-    }
-    response = post(url, headers=headers, json=data)
-    print("模板消息发送结果:", response.text)
+        headers = {
+            'Content-Type': 'application/json',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
+                        'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36'
+        }
+        response = post(url, headers=headers, json=data)
+        print("模板消息发送结果:", response.text)
 
 
 # 发送课程提醒消息
 def send_Class_Message(to_user, access_token, classInfo):
     url = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token={}".format(access_token)
-    theuser = to_user[0]
+    #theuser = to_user[0]
     class_name = classInfo['class_name']
     class_time = classInfo['class_time']
-    data = {
-        "touser": theuser,
-        "template_id": config.template_id2,
-        "url": "http://weixin.qq.com/download",
-        "topcolor": "#FF0000",
-        "data": {
-            "className": {
-                "value": class_name,
-                "color": "#FF8000"
-            },
-            "classTime": {
-                "value": class_time,
-                "color": "#FF8000"
+    for theuser in to_user:
+        data = {
+            "touser": theuser,
+            "template_id": config.template_id2,
+            "url": "http://weixin.qq.com/download",
+            "topcolor": "#FF0000",
+            "data": {
+                "className": {
+                    "value": class_name,
+                    "color": "#FF8000"
+                },
+                "classTime": {
+                    "value": class_time,
+                    "color": "#FF8000"
+                }
             }
         }
-    }
-    headers = {
-        'Content-Type': 'application/json',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
-                      'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36'
-    }
-    response = post(url, headers=headers, json=data)
-    print(response.text)
+        headers = {
+            'Content-Type': 'application/json',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
+                        'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36'
+        }
+        response = post(url, headers=headers, json=data)
+        print(response.text)
 
 
 
@@ -452,9 +485,8 @@ def calculate_Time_Difference(t1, t2):
     return (d1 - d2).seconds
 
 
-# ==================== 主程序 ====================
-
-if __name__ == '__main__':
+# ==================== 主函数 ====================
+def main(user):
     accessToken = get_access_token()
     print('token:', accessToken)
 
@@ -464,12 +496,10 @@ if __name__ == '__main__':
     city = config.city
     weather, max_temperature, min_temperature = get_weather(city)
 
-    isPost = False
-
     # 每日推送：模板消息显示完整内容，点击标题跳转彩色图片卡片
     if datetime.now().strftime('%H:%M:%S') < config.post_Time:
         send_message(user, accessToken, city, weather, max_temperature, min_temperature)
-        isPost = True
+
 
 
     # 课程提醒推送
@@ -514,9 +544,9 @@ if __name__ == '__main__':
 
             if nowTime >= endTime:
                 try:
-                    is_rain, weather_desc, precip = is_rainy_weather(city)
+                    is_rain, weather_desc, precip, cur_temperature = is_rainy_weather(city)
                     if is_rain:
-                        send_Rain_Reminder(user, accessToken, i + 1, weather_desc, precip)
+                        send_Rain_Reminder(user, accessToken, i + 1, weather_desc, precip, cur_temperature)
                         print("雨天提醒已发送")
                     else:
                         print("天气良好，无需提醒")
@@ -530,3 +560,7 @@ if __name__ == '__main__':
                 time.sleep(diff)
 
         break
+
+# ==================== 主程序 ====================
+if __name__ == '__main__':
+    main()
