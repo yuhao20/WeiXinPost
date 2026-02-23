@@ -21,6 +21,6 @@ jobs:
           python -m pip install --upgrade pip
           pip3 install -r requirements.txt
       - name: weixin
-        timeout-minutes: 10
+        timeout-minutes: 5
         run: |
           python3 main.py
