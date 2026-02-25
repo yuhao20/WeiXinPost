@@ -12,7 +12,7 @@ template_id2 = "oHf0CtjkUfYNM_AWUL7v5ZlMPKooLMK1dN2I3Z-w0Ug"
 template_id3 = "AneQEpDysBwH3xHb1YlU05MGz8hqsFZAAHRpqeCQFmk"
 # 接收公众号消息的微信号
 # 这是openid
-user = ["ofITE2LRLPbmzqCX4BbLXnpngxX0"]
+user = ["ofITE2Nz_6rL1YskmLDr9awpaWws","ofITE2LRLPbmzqCX4BbLXnpngxX0"]
 
 # 提醒时间窗口 触发剩余时间小于该值 s
 remain_time = 300
@@ -159,6 +159,7 @@ classes = {str(i): [[*random.choice(_phrases)] for _ in range(7)] for i in range
 # 第六讲: {{sixthClass.DATA}}
 
 # emoji: https://emoji6.com/emojiall/en
+
 
 
 
